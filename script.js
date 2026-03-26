@@ -2,6 +2,8 @@ const state = {
   lang: localStorage.getItem("lang") || "en"
 };
 
+let observer = null;
+
 function getData() {
   return window.profileData[state.lang];
 }
@@ -49,21 +51,25 @@ function renderHero(data) {
   if (scholarBtn) scholarBtn.href = site.scholar;
 
   const keywords = document.getElementById("heroKeywords");
-  keywords.innerHTML = data.heroKeywords
-    .map((item) => `<span class="keyword-chip">${item}</span>`)
-    .join("");
+  if (keywords) {
+    keywords.innerHTML = data.heroKeywords
+      .map((item) => `<span class="keyword-chip">${item}</span>`)
+      .join("");
+  }
 
   const quickInfo = document.getElementById("heroQuickInfo");
-  quickInfo.innerHTML = data.quickInfo
-    .map(
-      (item) => `
-        <div class="quick-info-card">
-          <span class="label">${item.label}</span>
-          <strong>${item.value}</strong>
-        </div>
-      `
-    )
-    .join("");
+  if (quickInfo) {
+    quickInfo.innerHTML = data.quickInfo
+      .map(
+        (item) => `
+          <div class="quick-info-card">
+            <span class="label">${item.label}</span>
+            <strong>${item.value}</strong>
+          </div>
+        `
+      )
+      .join("");
+  }
 }
 
 function renderAbout(data) {
@@ -73,6 +79,8 @@ function renderAbout(data) {
 
 function renderNews(data) {
   const list = document.getElementById("newsList");
+  if (!list) return;
+
   list.innerHTML = data.news
     .map(
       (item) => `
@@ -87,6 +95,8 @@ function renderNews(data) {
 
 function renderTimeline(containerId, items) {
   const container = document.getElementById(containerId);
+  if (!container) return;
+
   container.innerHTML = items
     .map(
       (item) => `
@@ -105,6 +115,8 @@ function renderResearch(data) {
   setText("#researchOverview", data.researchOverview);
 
   const topics = document.getElementById("researchTopics");
+  if (!topics) return;
+
   topics.innerHTML = data.researchTopics
     .map((item) => `<span class="chip">${item}</span>`)
     .join("");
@@ -112,11 +124,14 @@ function renderResearch(data) {
 
 function renderPublications(data) {
   const container = document.getElementById("publicationsList");
+  if (!container) return;
+
   container.innerHTML = data.publications
     .map((pub) => {
       const links = (pub.links || [])
-        .map((link) => `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`)
+        .map((link) => `<a href="${link.url}" target="_blank" rel="noopener">${link.label}</a>`)
         .join("");
+
       return `
         <article class="pub-item">
           <div class="pub-title">${pub.title}</div>
@@ -131,6 +146,8 @@ function renderPublications(data) {
 
 function renderProjects(data) {
   const container = document.getElementById("projectsGrid");
+  if (!container) return;
+
   container.innerHTML = data.projects
     .map((project) => {
       const tags = (project.tags || [])
@@ -138,7 +155,7 @@ function renderProjects(data) {
         .join("");
 
       const links = (project.links || [])
-        .map((link) => `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`)
+        .map((link) => `<a href="${link.url}" target="_blank" rel="noopener">${link.label}</a>`)
         .join("");
 
       return `
@@ -156,10 +173,12 @@ function renderProjects(data) {
 
 function renderContact(data) {
   const container = document.getElementById("contactList");
+  if (!container) return;
+
   container.innerHTML = data.contactItems
     .map(
       (item) => `
-        <a class="contact-item" href="${item.url}" target="_blank" rel="noopener noreferrer">
+        <a class="contact-item" href="${item.url}" target="_blank" rel="noopener">
           <div>
             <div class="label">${item.label}</div>
           </div>
@@ -174,6 +193,37 @@ function renderContact(data) {
 
 function renderFooter(data) {
   setText("#footerText", data.footerText);
+}
+
+function setupObserver() {
+  if (observer) observer.disconnect();
+
+  const targets = document.querySelectorAll(".fade-in");
+
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("show"));
+    return;
+  }
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -6% 0px"
+    }
+  );
+
+  targets.forEach((el) => {
+    el.classList.remove("show");
+    observer.observe(el);
+  });
 }
 
 function renderAll() {
@@ -195,7 +245,9 @@ function renderAll() {
     btn.classList.toggle("active", btn.dataset.lang === state.lang);
   });
 
-  observeFadeIn();
+  requestAnimationFrame(() => {
+    setupObserver();
+  });
 }
 
 function setupLanguageButtons() {
@@ -212,6 +264,8 @@ function setupMobileMenu() {
   const menuBtn = document.getElementById("menuBtn");
   const nav = document.getElementById("nav");
 
+  if (!menuBtn || !nav) return;
+
   menuBtn.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
@@ -221,37 +275,10 @@ function setupMobileMenu() {
   });
 }
 
-function observeFadeIn() {
-  const targets = document.querySelectorAll(".fade-in");
-
-  if (!("IntersectionObserver" in window)) {
-    targets.forEach((el) => el.classList.add("show"));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("show");
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
-
-  targets.forEach((el) => observer.observe(el));
-}
-
 function init() {
-  const site = window.profileData.site;
-  document.getElementById("brandName").textContent = getData().heroName;
-  document.getElementById("avatarImage").src = site.avatar;
-
   setupLanguageButtons();
   setupMobileMenu();
   renderAll();
 }
 
 window.addEventListener("DOMContentLoaded", init);
-``
