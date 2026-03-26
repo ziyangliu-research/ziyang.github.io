@@ -52,6 +52,7 @@ button {
   margin: 0 auto;
 }
 
+/* remove old dark decorative background */
 .bg-grid,
 .bg-orb,
 .orb-1,
@@ -155,7 +156,7 @@ button {
   margin: 3px auto;
 }
 
-/* glass card */
+/* cards */
 .glass {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -166,25 +167,20 @@ button {
 
 /* hero */
 .section-hero {
-  padding: 2.5rem 0 1rem;
+  padding: 2.8rem 0 1.2rem;
 }
 
-.hero-card {
+.hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) 320px;
-  gap: 1.4rem;
-  padding: 1.5rem;
-  align-items: stretch;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.2rem;
+  align-items: start;
 }
 
-.hero-main {
-  min-width: 0;
-}
-
-.hero-side {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.hero-text,
+.hero-visual,
+.content-card {
+  padding: 1.4rem;
 }
 
 .hero-tag {
@@ -257,48 +253,18 @@ button {
   border-color: transparent;
 }
 
-.avatar-shell {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: #f8fafc;
-  box-shadow: var(--shadow);
-}
-
-.avatar-shell img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-side-card {
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: #ffffff;
-  padding: 1rem;
-}
-
-.hero-side-title {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.hero-side-body {
+.hero-quick-info {
+  margin-top: 1.15rem;
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
 .quick-info-card {
   border: 1px solid var(--line);
   background: #ffffff;
-  border-radius: 14px;
-  padding: 0.8rem;
+  border-radius: 16px;
+  padding: 0.85rem;
 }
 
 .quick-info-card .label {
@@ -310,6 +276,60 @@ button {
 
 .quick-info-card strong {
   font-size: 0.96rem;
+}
+
+/* right hero visual */
+.hero-visual {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portrait-frame {
+  width: min(320px, 78%);
+  aspect-ratio: 1 / 1.16;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  box-shadow: var(--shadow);
+}
+
+.portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-floating-card {
+  position: absolute;
+  min-width: 180px;
+  max-width: 220px;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.floating-card-1 {
+  top: 10%;
+  left: 5%;
+}
+
+.floating-card-2 {
+  right: 5%;
+  bottom: 10%;
+}
+
+.floating-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.22rem;
 }
 
 /* sections */
@@ -348,10 +368,6 @@ button {
 
 .content-grid.single {
   grid-template-columns: 1fr;
-}
-
-.content-card {
-  padding: 1.4rem;
 }
 
 .content-card h3 {
@@ -576,10 +592,8 @@ button {
 /* animation */
 .fade-in {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
 }
 
 .fade-in.show {
@@ -593,14 +607,12 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .hero-card {
+  .hero-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero-side {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    align-items: start;
+  .hero-visual {
+    min-height: 340px;
   }
 }
 
@@ -631,7 +643,7 @@ button {
 
   .content-grid.two,
   .project-grid,
-  .hero-side {
+  .hero-quick-info {
     grid-template-columns: 1fr;
   }
 
@@ -649,7 +661,14 @@ button {
     font-size: clamp(2rem, 8vw, 2.5rem);
   }
 
-  .section-hero {
-    padding-top: 2rem;
+  .floating-card-1,
+  .floating-card-2 {
+    position: static;
+    margin-top: 0.9rem;
+  }
+
+  .hero-visual {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
